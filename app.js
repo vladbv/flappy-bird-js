@@ -15,6 +15,8 @@ let downTimerId;
 let isJumping = true;
 let isGoingLeft = false;
 let isGoingRight = false;
+let score = -1;
+
 
 let leftTimerId;
 let rightTimerId;
@@ -30,14 +32,29 @@ moveRight();
 } else if(e.key === 'ArrowUp'){
 //moveStraight
 //moves straight
-
+moveStraight();
 }
 
 
 }
 
+function moveStraight(){
+isGoingLeft = false;
+isGoingRight = false;
+
+clearInterval(leftTimerId);
+clearInterval(rightTimerId);
+
+}
 function moveLeft(){
 isGoingLeft = true;
+
+if(isGoingRight) {
+
+clearInterval(rightTimerId);
+isGoingRight = false;
+
+}
 
 leftTimerId = setInterval(function () {
 if(doodlerLeftSpace >= 0){
@@ -56,7 +73,14 @@ moveRight();
 
 function moveRight(){
 
+if(isGoingLeft){
+
+clearInterval(leftTimerId)
+isGoingLeft = false;
+}
+
 let isGoingRight = true;
+
 rightTimerId = setInterval(function(){
 
 if(doodlerLeftSpace <= 340){
@@ -108,14 +132,33 @@ function movePlatforms(){
 if (doodlerBottomSpace > 200) {
 
 platforms.forEach(platform => {
-
 platform.bottom -= 4;
 let visual = platform.visual;
 visual.style.bottom = platform.bottom + 'px';
 
+
+
+if(platform.bottom < 10) {
+let firstPlatform = platforms[0].visual;
+
+firstPlatform.classList.remove('platform');
+
+platforms.shift();
+
+score+=1;
+
+let newPlatform = new Platform(600);
+
+platforms.push(newPlatform);
+
+}
+
+
+
 });
 
 }
+
 
 }
 
@@ -145,13 +188,16 @@ doodler.style.bottom = doodlerBottomSpace + 'px';
 if (doodlerBottomSpace <= 0){
 gameOver();
 }
+
 platforms.forEach(platform => {
+
 if(
  (doodlerBottomSpace >= platform.bottom) && (doodlerBottomSpace <= platform.bottom + 15) && ((doodlerLeftSpace + 60) >= platform.left) && (doodlerLeftSpace <= (platform.left + 85)) && !isJumping
 
 ) {
 
-console.log('Landed');
+
+console.log('Landed '  );
 startPoint = doodlerBottomSpace;
 jump();
 
@@ -161,11 +207,17 @@ jump();
 }
 
 function gameOver(){
+while(grid.firstChild){
 
+grid.removeChild(grid.firstChild);
+}
+grid.innerHTML = score;
 console.log('Game over');
 isGameOver = true;
 clearInterval(upTimerId);
 clearInterval(downTimerId);
+clearInterval(leftTimerId);
+clearInterval(rightTimerId);
 
 }
 
