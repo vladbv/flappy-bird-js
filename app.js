@@ -8,7 +8,7 @@ const ground = document.querySelector('.ground');
 let birdLeft = 220;
 let birdBottom = 100;
 let gravity = 2;
-
+let isGameOver = false;
 
 
 function startGame(){
@@ -37,7 +37,7 @@ jump();
 
 function jump(){
 
-if(birdBottom < 500) birdBottom += 40;
+if(birdBottom < 500){ birdBottom += 50;}
 
 bird.style.bottom = birdBottom + 'px';
 console.log(birdBottom);
@@ -52,11 +52,12 @@ document.addEventListener('keyup', control);
 function generateObstacle(){
 
 let obstacleLeft = 500;
-let obstacleBottom = Math.random() * 65;
+let randomHeight = Math.random() * 60;
+let obstacleBottom = randomHeight;;
 
 const obstacle = document.createElement('div');
 
-obstacle.classList.add('obstacle');
+if(!isGameOver) obstacle.classList.add('obstacle');
 gameDisplay.appendChild(obstacle);
 obstacle.style.left = obstacleLeft + 'px';
 obstacle.style.bottom = obstacleBottom + 'px';
@@ -65,24 +66,38 @@ obstacle.style.bottom = obstacleBottom + 'px';
 
 function moveObstacle(){
 
-obstacleLeft -=5;
+obstacleLeft -=2;
 
 obstacle.style.left = obstacleLeft + 'px';
 
-if(obstacleLeft  === 0){
+if(obstacleLeft  === -60){
 clearInterval(timed);
 gameDisplay.removeChild(obstacle);
 }
+if (
+obstacleLeft > 200 && obstacleLeft < 280 && birdLeft === 220 && birdBottom < obstacleBottom + 160 ||
+birdBottom === 0) {
+
+
+gameOver();
+clearInterval(timed);
 }
+
+console.log('Game over');
 let timed = setInterval(moveObstacle, 20);
 
 
-setTimeout(generateObstacle, 3000);
+if(!isGameOver) setTimeout(generateObstacle, 3000);
 
 }
 
 
 generateObstacle();
+function gameOver(){
 
+clearInterval(timerId);
+isGameOver = true;
+document.removeEventListener('keyup', control);
+}
 });
 
